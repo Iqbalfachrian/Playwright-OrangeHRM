@@ -76,4 +76,61 @@ test.describe('Navigate to Admin Menu', () => {
         await expect(assertJobTitles).toContainText('Bekerja sepenuh hati');
 
     })
+
+    test('Test-003: Edit Job', async ({ page }) => {
+        const targetRow = page.getByRole('row').filter({ hasText: 'Account Assistant'})
+        await expect(targetRow).toBeVisible();
+
+        const clickCheckBox = targetRow.locator('.oxd-checkbox-input');
+        await clickCheckBox.click();
+
+        const editButton = targetRow.locator('button:has(i.bi-pencil-fill)');
+        await editButton.click();
+
+        await expect(page).toHaveURL(/saveJobTitle/);
+        await page.waitForTimeout(1000);
+        await expect(page.getByRole('heading', {name: 'Edit Job Title'})).toBeVisible();
+
+        const jobTitleEdit = page
+        .locator('.oxd-input-group')
+        .filter({ hasText: 'Job Title'})
+        .locator('input')
+
+        await expect(jobTitleEdit).toBeVisible();
+        await expect(jobTitleEdit).toBeEditable();
+        await jobTitleEdit.fill('Testing testing');
+
+        await page.getByRole('button', { name:'Save'}).click();
+    })
+
+    test('Test-004: Delete Job', async({ page }) => {
+        const targetRow = page.getByRole('row').filter({ hasText: 'QA Engineer' })
+        await expect(targetRow).toBeVisible();
+
+        const clickCheckbox = targetRow.locator('.oxd-checkbox-input');
+        await expect(clickCheckbox).toBeVisible();
+
+        const deleteButton = targetRow.locator('button:has(i.bi-trash)');
+        await deleteButton.click();
+
+        // const popUpTitle = page.getByText('Are you Sure?') 
+        // await expect(popUpTitle).toBeVisible(); 
+        // await expect(page.getByText('The selected record will be permanently deleted. Are you sure you want to continue?')).toBeVisible();
+
+        const deletePopUp = page.locator('.oxd-dialog-sheet');
+        await expect(deletePopUp).toContainText('Are you Sure?');
+        await expect(deletePopUp).toContainText('The selected record will be permanently deleted. Are you sure you want to continue?')
+
+        await page.getByRole('button', {name: 'Yes, Delete'}).click();
+
+        //assert toast notif
+        const assertNotif = page
+        .locator('.oxd-text--toast-message')
+        
+        await expect(assertNotif).toBeVisible();
+        await expect(assertNotif).toContainText('Successfully Deleted')
+        await expect(assertNotif).toBeHidden({ timeout: 5000})
+
+
+    })
 })
