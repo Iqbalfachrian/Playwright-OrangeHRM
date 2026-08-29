@@ -1,6 +1,6 @@
 import { test, expect } from '@playwright/test'
 import { loginOrangeHRM } from '../helper/auth.helper'
-import path from 'path'
+
 
 test.describe('Navigate to PIM Menu', () => {
     test.beforeEach(async ({ page }) => {
@@ -37,6 +37,7 @@ test.describe('Navigate to PIM Menu', () => {
         await expect(page).toHaveURL(/definePredefinedReport/);
         await expect(page.getByText('Add Report')).toBeVisible();
 
+        //Add Report
         await page.getByRole('textbox', {name:'Type here ...'}).fill('Anang');
 
         const selectionCriteria = page
@@ -56,8 +57,6 @@ test.describe('Navigate to PIM Menu', () => {
         .locator('button:has(i.bi-plus)').first();
         await plusButton.click();
 
-        await page.locator('button:has(i.bi-plus)').first().click();
-
         //Fill autocomplete
         const employeeName = page.getByPlaceholder('Type for hints...')
 
@@ -68,7 +67,43 @@ test.describe('Navigate to PIM Menu', () => {
         const targetOption = page.getByRole('option', { name: 'Timothy Lewis Amiano'})
         await expect(targetOption).toBeVisible({ timeout: 5000})
         await targetOption.click();
-        await expect(employeeName).toHaveValue('Timothy Lewis Amiano')
-    
+        await expect(employeeName).toHaveValue('Timothy Lewis Amiano');
+
+        //Display Fields Group
+        const groupDisplayFields = page
+        .locator('.oxd-input-group')
+        .filter({
+            hasText: 'Select Display Field Group'
+        })
+
+        const pickDisplayFieldsbyGroup = groupDisplayFields.locator('.oxd-select-wrapper')
+        await pickDisplayFieldsbyGroup.click()
+        await page
+        .getByRole('listbox')
+        .getByText('Salary', {exact: true})
+        .click();
+
+        await expect(groupDisplayFields.locator('.oxd-select-text-input')).toContainText('Salary')
+
+
+
+        //Select Display Field
+        const labelSelectDisplayFields = page
+        .locator('.oxd-input-group')
+        .filter({
+            hasText: 'Select Display Field'
+        })
+
+        const selectDisplayFields = labelSelectDisplayFields.locator('.oxd-select-wrapper')
+        await selectDisplayFields.last().click();
+        await page
+        .getByRole('listbox')
+        .getByText('Amount', {exact: true})
+        .click();
+        
+        await expect(labelSelectDisplayFields.locator('.oxd-select-text-input').last()).toContainText('Amount');
+
+        //Save reports
+        await page.getByRole('button', {name: 'Save'}).click()
     })
 })

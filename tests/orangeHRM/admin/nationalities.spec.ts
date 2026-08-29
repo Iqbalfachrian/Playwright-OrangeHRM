@@ -13,7 +13,7 @@ test.describe('Navigate to Admin Menu', () => {
         await page.getByRole('link', { name: 'Nationalities '}).click();
 
         await expect(page).toHaveURL(/nationality/);
-        await expect(page.getByRole('heading', { name: 'Nationalities' }));
+        await expect(page.getByRole('heading', { name: 'Nationalities' })).toBeVisible();
         
     //     // const mainTitle = page.locator('.oxd-text--h6')
     //     // await expect(mainTitle).toContainText('Nationalities')
@@ -40,7 +40,7 @@ test.describe('Navigate to Admin Menu', () => {
 
         //Assertions
         await expect(page).toHaveURL(/nationality/);
-        await expect(page.getByRole('heading', { name: 'Nationalities' }))
+        await expect(page.getByRole('heading', { name: 'Nationalities' })).toBeVisible();
     })
 
     test('Test-003: Add Nationalities Negative', async ({ page }) => {
