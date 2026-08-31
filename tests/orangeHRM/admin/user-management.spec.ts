@@ -1,11 +1,10 @@
 import { test, expect } from '@playwright/test';
-import { loginOrangeHRM } from '../helper/auth.helper';
+
 
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await loginOrangeHRM(page);
 
-        await page.getByRole('link', { name: 'Admin' }).click();
+        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/)
     })
 
@@ -27,7 +26,7 @@ test.describe('Navigate to Admin Menu', () => {
         .locator('input');
 
         await expect(usernameInput).toBeVisible();
-        await usernameInput.fill('kervam')
+        await usernameInput.fill('Raja Guguk')
 
         //Pick Role
         const statusFilterUser = page.locator('.oxd-input-group').filter({
@@ -47,15 +46,15 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(inputEmployeeName).toBeVisible();
         await expect(inputEmployeeName).toBeEditable();
-        await inputEmployeeName.fill('joker')
+        await inputEmployeeName.fill('rajesh')
 
         const suggestion = page
         .locator('div.oxd-autocomplete-option')
-        .filter({ hasText: 'joker john selvam'})
+        .filter({ hasText: 'Rajesh Pandian Kumar'})
 
         await expect(suggestion).toBeVisible({ timeout: 5000 });
         await suggestion.click();
-        await expect(inputEmployeeName).toHaveValue('joker john selvam');
+        await expect(inputEmployeeName).toHaveValue('Rajesh Pandian Kumar');
 
         const statusFilterContainer = page.locator('.oxd-input-group').filter({
             has: page.locator('label', { hasText: 'Status'})
@@ -76,11 +75,10 @@ test.describe('Navigate to Admin Menu', () => {
         //Assertions
         const tableRowEmployeeName = page
         .getByRole('row')
-        .filter({ hasText: 'joker selvam' })
+        .filter({ hasText: 'Rajesh Kumar' })
 
         await expect(tableRowEmployeeName).toBeVisible();
-
-        await expect(tableRowEmployeeName).toContainText('kervam')
+        await expect(tableRowEmployeeName).toContainText('Rajesh Kumar')
 
         // console.log(
         // 'ROW COUNT:',

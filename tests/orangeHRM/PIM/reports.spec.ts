@@ -1,12 +1,10 @@
 import { test, expect } from '@playwright/test'
-import { loginOrangeHRM } from '../helper/auth.helper'
 
 
 test.describe('Navigate to PIM Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await loginOrangeHRM(page);
 
-        await page.getByRole('link', { name: 'PIM'}).click();
+        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewEmployeeList');
         await expect(page).toHaveURL(/viewEmployeeList/);
 
         await page.getByRole('link', {name: 'Reports'}).click();
@@ -38,7 +36,7 @@ test.describe('Navigate to PIM Menu', () => {
         await expect(page.getByText('Add Report')).toBeVisible();
 
         //Add Report
-        await page.getByRole('textbox', {name:'Type here ...'}).fill('Anang');
+        await page.getByRole('textbox', {name:'Type here ...'}).fill('Steven Gerrard');
 
         const selectionCriteria = page
         .locator('.oxd-input-group')
@@ -85,8 +83,6 @@ test.describe('Navigate to PIM Menu', () => {
 
         await expect(groupDisplayFields.locator('.oxd-select-text-input')).toContainText('Salary')
 
-
-
         //Select Display Field
         const labelSelectDisplayFields = page
         .locator('.oxd-input-group')
@@ -103,7 +99,15 @@ test.describe('Navigate to PIM Menu', () => {
         
         await expect(labelSelectDisplayFields.locator('.oxd-select-text-input').last()).toContainText('Amount');
 
+        //button + on Display Fields
+        const plusButtonDisplay = page
+        .locator('button:has(i.bi-plus)').last();
+        await plusButtonDisplay.click();
+
         //Save reports
         await page.getByRole('button', {name: 'Save'}).click()
+
+        //assertions reports
+        await expect(page).toHaveURL(/displayPredefinedReport/)
     })
 })

@@ -1,12 +1,9 @@
 import { test, expect } from '@playwright/test'
-import { loginOrangeHRM } from '../helper/auth.helper'
-import path from 'path'
+
 
 test.describe('Navigate to PIM Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await loginOrangeHRM(page);
-
-        await page.getByRole('link', { name: 'PIM'}).click();
+        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewEmployeeList');
         await expect(page).toHaveURL(/viewEmployeeList/);
     })
 

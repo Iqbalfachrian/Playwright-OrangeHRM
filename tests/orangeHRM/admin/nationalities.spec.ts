@@ -1,11 +1,8 @@
 import { test, expect } from '@playwright/test';
-import { loginOrangeHRM } from '../helper/auth.helper';
 
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await loginOrangeHRM(page);
-
-        await page.getByRole('link', { name: 'Admin'}).click();
+          await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/) 
     })
 
@@ -54,7 +51,7 @@ test.describe('Navigate to Admin Menu', () => {
         const nameInput = page.locator('.oxd-input-group').filter({ hasText: 'Name' }).locator('input');
 
         await expect(nameInput).toBeVisible();
-        await nameInput.fill('Australian');
+        await nameInput.fill('American');
         await expect(page.getByText('Already exists')).toBeVisible({ timeout: 5000 });
 
         //await page.waitForTimeout(3000)

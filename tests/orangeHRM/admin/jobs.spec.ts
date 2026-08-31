@@ -1,23 +1,25 @@
 import { test, expect } from '@playwright/test'
-import { loginOrangeHRM } from '../helper/auth.helper'
 import path from 'path'
 
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await loginOrangeHRM(page);
-
-        await page.getByRole('link', { name: 'Admin' }).click();
+        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/)
-
-        await page.getByText('Job', { exact: true }).click();
-        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
     })
 
     test('Test-001: Go to Job List', async ({ page }) => {
+        await page.getByText('Job', { exact: true }).click();
+        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
+
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
     })
 
     test('Test-002: Add Job Titles', async ({ page }) => {
+
+        await page.getByText('Job', { exact: true }).click();
+        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
+
+        await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
 
         await page.getByRole('button', { name: 'Add' }).click();
         await expect(page).toHaveURL(/saveJobTitle/);
@@ -78,7 +80,12 @@ test.describe('Navigate to Admin Menu', () => {
     })
 
     test('Test-003: Edit Job', async ({ page }) => {
-        const targetRow = page.getByRole('row').filter({ hasText: 'Account Assistant'})
+
+        await page.getByText('Job', { exact: true }).click();
+        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
+
+        await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
+        const targetRow = page.getByRole('row').filter({ hasText: 'Finance Manager'})
         await expect(targetRow).toBeVisible();
 
         const clickCheckBox = targetRow.locator('.oxd-checkbox-input');
@@ -104,6 +111,10 @@ test.describe('Navigate to Admin Menu', () => {
     })
 
     test('Test-004: Delete Job', async({ page }) => {
+        await page.getByText('Job', { exact: true }).click();
+        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
+
+        await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
         const targetRow = page.getByRole('row').filter({ hasText: 'QA Engineer' })
         await expect(targetRow).toBeVisible();
 
