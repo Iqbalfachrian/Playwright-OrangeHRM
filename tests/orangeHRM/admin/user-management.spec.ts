@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test';
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
 
-        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
+        await page.goto('/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/)
     })
 
@@ -26,7 +26,7 @@ test.describe('Navigate to Admin Menu', () => {
         .locator('input');
 
         await expect(usernameInput).toBeVisible();
-        await usernameInput.fill('Raja Guguk')
+        await usernameInput.fill('John Connor')
 
         //Pick Role
         const statusFilterUser = page.locator('.oxd-input-group').filter({
@@ -46,15 +46,15 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(inputEmployeeName).toBeVisible();
         await expect(inputEmployeeName).toBeEditable();
-        await inputEmployeeName.fill('rajesh')
+        await inputEmployeeName.fill('John')
 
         const suggestion = page
         .locator('div.oxd-autocomplete-option')
-        .filter({ hasText: 'Rajesh Pandian Kumar'})
+        .filter({ hasText: 'John Doe Admin'})
 
         await expect(suggestion).toBeVisible({ timeout: 5000 });
         await suggestion.click();
-        await expect(inputEmployeeName).toHaveValue('Rajesh Pandian Kumar');
+        await expect(inputEmployeeName).toHaveValue('John Doe Admin');
 
         const statusFilterContainer = page.locator('.oxd-input-group').filter({
             has: page.locator('label', { hasText: 'Status'})
@@ -75,10 +75,10 @@ test.describe('Navigate to Admin Menu', () => {
         //Assertions
         const tableRowEmployeeName = page
         .getByRole('row')
-        .filter({ hasText: 'Rajesh Kumar' })
+        .filter({ hasText: 'John Admin' })
 
         await expect(tableRowEmployeeName).toBeVisible();
-        await expect(tableRowEmployeeName).toContainText('Rajesh Kumar')
+        await expect(tableRowEmployeeName).toContainText('John Admin')
 
         // console.log(
         // 'ROW COUNT:',
@@ -109,6 +109,7 @@ test.describe('Navigate to Admin Menu', () => {
         await page.getByText('Job', { exact: true }).click();
         await page.getByRole('menuitem', { name: 'Job Titles '}).click();
 
+        await expect(page).toHaveURL(/viewJobTitleList/);
         await expect(page.getByRole('heading', ({ name: 'Job Titles'}))).toBeVisible();
     })
 })

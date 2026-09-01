@@ -3,7 +3,7 @@ import path from 'path'
 
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
+        await page.goto('/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/)
     })
 
@@ -22,7 +22,7 @@ test.describe('Navigate to Admin Menu', () => {
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
 
         await page.getByRole('button', { name: 'Add' }).click();
-        await expect(page).toHaveURL(/saveJobTitle/);
+        await expect(page.getByText('Add Job Title')).toBeVisible();
 
         //fill Job Title
         const jobTitleInput = page
@@ -32,7 +32,7 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobTitleInput).toBeVisible();
         await expect(jobTitleInput).toBeEditable();
-        await jobTitleInput.fill('QA tapi BA');
+        await jobTitleInput.fill('Manual QA');
 
         //fill Job Description
         const jobDescriptionInput = page
@@ -42,7 +42,7 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobDescriptionInput).toBeVisible();
         await expect(jobDescriptionInput).toBeEditable();
-        await jobDescriptionInput.fill('Bekerja sepenuh hati')
+        await jobDescriptionInput.fill('Bekerja setengah hati')
 
         //upload file
         const fileName = 'dummy.pdf'
@@ -72,10 +72,10 @@ test.describe('Navigate to Admin Menu', () => {
 
         //assert job titles & job description
         await expect(page).toHaveURL(/viewJobTitleList/);
-        const assertJobTitles = page.getByRole('row').filter({ hasText: 'QA tapi BA'})
+        const assertJobTitles = page.getByRole('row').filter({ hasText: 'Manual QA'})
         
         await expect(assertJobTitles).toBeVisible();
-        await expect(assertJobTitles).toContainText('Bekerja sepenuh hati');
+        await expect(assertJobTitles).toContainText('Bekerja setengah hati');
 
     })
 
@@ -85,7 +85,7 @@ test.describe('Navigate to Admin Menu', () => {
         await page.getByRole('menuitem', { name: 'Job Titles'}).click();
 
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
-        const targetRow = page.getByRole('row').filter({ hasText: 'Finance Manager'})
+        const targetRow = page.getByRole('row').filter({ hasText: 'Head of Support'})
         await expect(targetRow).toBeVisible();
 
         const clickCheckBox = targetRow.locator('.oxd-checkbox-input');
@@ -105,9 +105,11 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobTitleEdit).toBeVisible();
         await expect(jobTitleEdit).toBeEditable();
-        await jobTitleEdit.fill('Testing testing');
-
+        await jobTitleEdit.fill('Lagi Testing Playwright');
         await page.getByRole('button', { name:'Save'}).click();
+
+        await expect(jobTitleEdit).toHaveValue('Lagi Testing Playwright');
+
     })
 
     test('Test-004: Delete Job', async({ page }) => {
@@ -115,7 +117,7 @@ test.describe('Navigate to Admin Menu', () => {
         await page.getByRole('menuitem', { name: 'Job Titles'}).click();
 
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
-        const targetRow = page.getByRole('row').filter({ hasText: 'QA Engineer' })
+        const targetRow = page.getByRole('row').filter({ hasText: 'rsjsrii' })
         await expect(targetRow).toBeVisible();
 
         const clickCheckbox = targetRow.locator('.oxd-checkbox-input');
@@ -141,7 +143,6 @@ test.describe('Navigate to Admin Menu', () => {
         await expect(assertNotif).toBeVisible();
         await expect(assertNotif).toContainText('Successfully Deleted')
         await expect(assertNotif).toBeHidden({ timeout: 5000})
-
 
     })
 })

@@ -2,7 +2,7 @@ import { test, expect } from '@playwright/test';
 
 test.describe('Navigate to Admin Menu', () => {
     test.beforeEach(async ({ page }) => {
-          await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/admin/viewSystemUsers')
+        await page.goto('/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/) 
     })
 
@@ -23,7 +23,7 @@ test.describe('Navigate to Admin Menu', () => {
         await page.getByRole('button', { name: 'Add '}).click();
 
         await expect(page.getByText('Add Nationality')).toBeVisible();
-        await expect(page).toHaveURL('https://opensource-demo.orangehrmlive.com/web/index.php/admin/saveNationality');
+        await expect(page).toHaveURL('/web/index.php/admin/saveNationality');
 
         const nameInput = page
         .locator('.oxd-input-group')

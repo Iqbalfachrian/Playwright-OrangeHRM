@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test'
+import path from 'path'
 
 
 test.describe('Navigate to PIM Menu', () => {
     test.beforeEach(async ({ page }) => {
-        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewEmployeeList');
+        await page.goto('/web/index.php/pim/viewEmployeeList');
         await expect(page).toHaveURL(/viewEmployeeList/);
     })
 

@@ -8,7 +8,7 @@ export default defineConfig({
     headless: false,
     baseURL: 'https://opensource-demo.orangehrmlive.com',
     launchOptions: {
-      slowMo: 1000,
+      //slowMo: 1000,
     },
     actionTimeout: 10_000,
     trace: 'on-first-retry',

@@ -4,7 +4,7 @@ import { test, expect } from '@playwright/test'
 test.describe('Navigate to PIM Menu', () => {
     test.beforeEach(async ({ page }) => {
 
-        await page.goto('https://opensource-demo.orangehrmlive.com/web/index.php/pim/viewEmployeeList');
+        await page.goto('/web/index.php/pim/viewEmployeeList');
         await expect(page).toHaveURL(/viewEmployeeList/);
 
         await page.getByRole('link', {name: 'Reports'}).click();
@@ -60,12 +60,12 @@ test.describe('Navigate to PIM Menu', () => {
 
         await expect(employeeName).toBeVisible();
         await expect(employeeName).toBeEditable();
-        await employeeName.fill('Timothy')
+        await employeeName.fill('admin')
 
-        const targetOption = page.getByRole('option', { name: 'Timothy Lewis Amiano'})
+        const targetOption = page.getByRole('option', { name: 'admin  Admin'})
         await expect(targetOption).toBeVisible({ timeout: 5000})
         await targetOption.click();
-        await expect(employeeName).toHaveValue('Timothy Lewis Amiano');
+        await expect(employeeName).toHaveValue('admin  Admin');
 
         //Display Fields Group
         const groupDisplayFields = page
