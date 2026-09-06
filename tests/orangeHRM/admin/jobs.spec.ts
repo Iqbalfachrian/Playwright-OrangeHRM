@@ -1,23 +1,28 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
+import { generateUniqueString } from '../../../utils/testData'
+
+let createdJobTitle: string;
+let editedJobTitle: string;
 
 test.describe('Navigate to Admin Menu', () => {
+    test.describe.configure({ mode: 'serial' })
     test.beforeEach(async ({ page }) => {
         await page.goto('/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/)
+
+        await page.getByText('Job', { exact: true }).click();
+        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
     })
 
     test('Test-001: Go to Job List', async ({ page }) => {
-        await page.getByText('Job', { exact: true }).click();
-        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
-
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
     })
 
     test('Test-002: Add Job Titles', async ({ page }) => {
-
-        await page.getByText('Job', { exact: true }).click();
-        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
+        //generate unique data test
+        createdJobTitle = generateUniqueString('QA Manual');
+        const uniqueJobDesc = `Description for ${createdJobTitle}`;
 
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
 
@@ -32,7 +37,7 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobTitleInput).toBeVisible();
         await expect(jobTitleInput).toBeEditable();
-        await jobTitleInput.fill('Manual QA');
+        await jobTitleInput.fill(createdJobTitle);
 
         //fill Job Description
         const jobDescriptionInput = page
@@ -42,7 +47,7 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobDescriptionInput).toBeVisible();
         await expect(jobDescriptionInput).toBeEditable();
-        await jobDescriptionInput.fill('Bekerja setengah hati')
+        await jobDescriptionInput.fill(uniqueJobDesc);
 
         //upload file
         const fileName = 'dummy.pdf'
@@ -72,20 +77,18 @@ test.describe('Navigate to Admin Menu', () => {
 
         //assert job titles & job description
         await expect(page).toHaveURL(/viewJobTitleList/);
-        const assertJobTitles = page.getByRole('row').filter({ hasText: 'Manual QA'})
-        
-        await expect(assertJobTitles).toBeVisible();
-        await expect(assertJobTitles).toContainText('Bekerja setengah hati');
+
+        const targetRow = page.getByRole('row').filter({ hasText: createdJobTitle });
+        await expect(targetRow).toBeVisible();
+        await expect(targetRow).toContainText(uniqueJobDesc);
 
     })
 
     test('Test-003: Edit Job', async ({ page }) => {
 
-        await page.getByText('Job', { exact: true }).click();
-        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
-
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
-        const targetRow = page.getByRole('row').filter({ hasText: 'Head of Support'})
+
+        const targetRow = page.getByRole('row').filter({ hasText: createdJobTitle });
         await expect(targetRow).toBeVisible();
 
         const clickCheckBox = targetRow.locator('.oxd-checkbox-input');
@@ -95,7 +98,6 @@ test.describe('Navigate to Admin Menu', () => {
         await editButton.click();
 
         await expect(page).toHaveURL(/saveJobTitle/);
-        await page.waitForTimeout(1000);
         await expect(page.getByRole('heading', {name: 'Edit Job Title'})).toBeVisible();
 
         const jobTitleEdit = page
@@ -105,29 +107,30 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(jobTitleEdit).toBeVisible();
         await expect(jobTitleEdit).toBeEditable();
-        await jobTitleEdit.fill('Lagi Testing Playwright');
+
+        editedJobTitle = generateUniqueString('QA Manual Edited');
+        await jobTitleEdit.fill(editedJobTitle);
         await page.getByRole('button', { name:'Save'}).click();
 
-        await expect(jobTitleEdit).toHaveValue('Lagi Testing Playwright');
+        await expect(jobTitleEdit).toHaveValue(editedJobTitle);
+        await expect(page).toHaveURL(/viewJobTitleList/);
 
     })
 
     test('Test-004: Delete Job', async({ page }) => {
-        await page.getByText('Job', { exact: true }).click();
-        await page.getByRole('menuitem', { name: 'Job Titles'}).click();
-
         await expect(page.getByRole('heading', { name: 'Job Titles'})).toBeVisible();
-        const targetRow = page.getByRole('row').filter({ hasText: 'rsjsrii' })
+        const targetRow = page.getByRole('row').filter({ hasText: editedJobTitle })
         await expect(targetRow).toBeVisible();
 
         const clickCheckbox = targetRow.locator('.oxd-checkbox-input');
         await expect(clickCheckbox).toBeVisible();
+        await clickCheckbox.click();
 
         const deleteButton = targetRow.locator('button:has(i.bi-trash)');
         await deleteButton.click();
 
         // const popUpTitle = page.getByText('Are you Sure?') 
-        // await expect(popUpTitle).toBeVisible(); 
+        // await expect(popUpTitle).toBeVisible(); `
         // await expect(page.getByText('The selected record will be permanently deleted. Are you sure you want to continue?')).toBeVisible();
 
         const deletePopUp = page.locator('.oxd-dialog-sheet');

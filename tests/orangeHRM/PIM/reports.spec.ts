@@ -1,4 +1,5 @@
 import { test, expect } from '@playwright/test'
+import { generateUniqueString } from '../../../utils/testData'
 
 
 test.describe('Navigate to PIM Menu', () => {
@@ -31,12 +32,14 @@ test.describe('Navigate to PIM Menu', () => {
     })
 
     test('Test-002: Add Employee Reports', async ({ page }) => {
+        const uniqueReportName = generateUniqueString('QA Manual Report')
+
         await page.getByRole('button', { name: 'Add'}).click();
         await expect(page).toHaveURL(/definePredefinedReport/);
         await expect(page.getByText('Add Report')).toBeVisible();
 
         //Add Report
-        await page.getByRole('textbox', {name:'Type here ...'}).fill('Steven Gerrard');
+        await page.getByRole('textbox', {name:'Type here ...'}).fill(uniqueReportName);
 
         const selectionCriteria = page
         .locator('.oxd-input-group')
@@ -60,12 +63,12 @@ test.describe('Navigate to PIM Menu', () => {
 
         await expect(employeeName).toBeVisible();
         await expect(employeeName).toBeEditable();
-        await employeeName.fill('admin')
+        await employeeName.fill('Timothy')
 
-        const targetOption = page.getByRole('option', { name: 'admin  Admin'})
+        const targetOption = page.getByRole('option', { name: 'Timothy Lewis Amiano'})
         await expect(targetOption).toBeVisible({ timeout: 5000})
         await targetOption.click();
-        await expect(employeeName).toHaveValue('admin  Admin');
+        await expect(employeeName).toHaveValue('Timothy Lewis Amiano');
 
         //Display Fields Group
         const groupDisplayFields = page

@@ -3,7 +3,13 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
-  "scripts": {},
+  "scripts": {
+    "test": "playwright test",
+    "test:ui": "playwright test --ui",
+    "test:headed": "playwright test --headed",
+    "test:login:headed": "playwright test tests/login.spec.ts --headed",
+    "test:auth": "playwright test tests/auth.setup.ts --headed"
+  },
   "keywords": [],
   "author": "",
   "license": "ISC",

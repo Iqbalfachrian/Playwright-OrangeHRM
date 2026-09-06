@@ -1,6 +1,8 @@
 import { test, expect } from '@playwright/test';
+import { generateUniqueString } from '../../../utils/testData';
 
 test.describe('Navigate to Admin Menu', () => {
+    test.describe.configure({ mode: 'serial'})
     test.beforeEach(async ({ page }) => {
         await page.goto('/web/index.php/admin/viewSystemUsers')
         await expect(page).toHaveURL(/admin/) 
@@ -31,7 +33,8 @@ test.describe('Navigate to Admin Menu', () => {
         .locator('input');
 
         await expect(nameInput).toBeVisible();
-        await nameInput.fill('Meikarta')
+        const uniqueNationality = generateUniqueString('Indonesia');
+        await nameInput.fill(uniqueNationality);
 
         await page.getByRole('button', { name: 'Save'}).click();
 

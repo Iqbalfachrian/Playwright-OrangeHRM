@@ -1,7 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { generateUniqueString } from '../../../utils/testData';
 
+let createdUsername: string;
 
 test.describe('Navigate to Admin Menu', () => {
+    test.describe.configure({ mode: 'serial' })
     test.beforeEach(async ({ page }) => {
 
         await page.goto('/web/index.php/admin/viewSystemUsers')
@@ -19,14 +22,104 @@ test.describe('Navigate to Admin Menu', () => {
 
     })
 
-    test('Test-002: Search User on User Management', async ({ page }) => {
+    test('Test-002: Add User Management', async ({ page }) => {
+        await page.getByRole('button', { name: 'Add' }).click();
+        await expect(page.getByText('Add User')).toBeVisible();
+
+        //Pick User Role
+        const userRole = page
+        .locator('.oxd-input-group')
+        .filter({ 
+        has: page.locator('label', { hasText: 'User Role'})})
+        
+        const userRoleDropdown = userRole.locator('.oxd-select-wrapper');
+        await userRoleDropdown.click();
+        await page
+        .getByRole('listbox')
+        .getByText('Admin', { exact: true })
+        .click();
+
+        //Autocomplete search Employee Name
+        const inputEmployeeName = page
+        .getByPlaceholder('Type for hints...')
+        await expect(inputEmployeeName).toBeVisible();
+        await expect(inputEmployeeName).toBeEditable();
+        await inputEmployeeName.fill('manda')
+
+        const suggestionName = page
+        .locator('div.oxd-autocomplete-option')
+        .filter({ hasText: 'manda akhil user'});
+        await expect(suggestionName).toBeVisible({ timeout: 3000 });
+        await suggestionName.click();
+        await expect(inputEmployeeName).toHaveValue('manda akhil user');
+
+        //Pick Status
+        const statusFilterContainer = page
+        .locator('.oxd-input-group')
+        .filter({ has: page.locator('label',
+            { hasText: 'Status'}
+        )})
+
+        const statusDropdown = statusFilterContainer.locator('.oxd-select-wrapper');
+        await statusDropdown.click();
+        await page
+        .getByRole('listbox')
+        .getByText('Enabled', { exact: true })
+        .click();
+
+        //Fill Username
         const usernameInput = page
         .locator('.oxd-input-group')
-        .filter({ hasText: 'Username' })
+        .filter({ hasText: /^Username$/ })
+        .locator('input');
+
+        createdUsername = generateUniqueString('Batman');
+        await expect(usernameInput).toBeVisible();
+        await expect(usernameInput).toBeEditable();
+        await usernameInput.fill(createdUsername);
+
+        //Fill Password
+        const passwordInput = page
+        .locator('.oxd-input-group')
+        .filter({ hasText: /^Password$/ })
+        .locator('input[type="password"]');
+
+        await expect(passwordInput).toBeVisible();
+        await expect(passwordInput).toBeEditable();
+        await passwordInput.fill('Admin123!@');
+
+        //Fill Confirm Password
+        const confirmPasswordInput = page
+        .locator('.oxd-input-group')
+        .filter({ hasText: /^Confirm Password$/ })
+        .locator('input[type="password"]');
+
+        await expect(confirmPasswordInput).toBeVisible();
+        await expect(confirmPasswordInput).toBeEditable();
+        await confirmPasswordInput.fill('Admin123!@');
+
+        //Click button Save
+        await page.getByRole('button', {name: 'Save'}).click();
+
+        //Assertions
+        const tableUser = page
+        .getByRole('row')
+        .filter({ hasText: createdUsername })
+        await expect(tableUser).toBeVisible();
+        await expect(tableUser).toContainText(createdUsername);
+        
+    })
+
+    test('Test-003: Search User on User Management', async ({ page }) => {
+        const usernameInput = page
+        .locator('.oxd-input-group')
+        .filter({ hasText: /^Username$/ })
         .locator('input');
 
         await expect(usernameInput).toBeVisible();
-        await usernameInput.fill('John Connor')
+        await expect(usernameInput).toBeEditable();
+        await usernameInput.fill(createdUsername)
+    
 
         //Pick Role
         const statusFilterUser = page.locator('.oxd-input-group').filter({
@@ -46,16 +139,17 @@ test.describe('Navigate to Admin Menu', () => {
 
         await expect(inputEmployeeName).toBeVisible();
         await expect(inputEmployeeName).toBeEditable();
-        await inputEmployeeName.fill('John')
+        await inputEmployeeName.fill('manda')
 
         const suggestion = page
         .locator('div.oxd-autocomplete-option')
-        .filter({ hasText: 'John Doe Admin'})
+        .filter({ hasText: 'manda akhil user'})
 
         await expect(suggestion).toBeVisible({ timeout: 5000 });
         await suggestion.click();
-        await expect(inputEmployeeName).toHaveValue('John Doe Admin');
+        await expect(inputEmployeeName).toHaveValue('manda akhil user');
 
+        //Pick Status
         const statusFilterContainer = page.locator('.oxd-input-group').filter({
             has: page.locator('label', { hasText: 'Status'})
         });
@@ -75,10 +169,10 @@ test.describe('Navigate to Admin Menu', () => {
         //Assertions
         const tableRowEmployeeName = page
         .getByRole('row')
-        .filter({ hasText: 'John Admin' })
+        .filter({ hasText: createdUsername })
 
         await expect(tableRowEmployeeName).toBeVisible();
-        await expect(tableRowEmployeeName).toContainText('John Admin')
+        await expect(tableRowEmployeeName).toContainText(createdUsername);
 
         // console.log(
         // 'ROW COUNT:',
@@ -105,7 +199,7 @@ test.describe('Navigate to Admin Menu', () => {
         // );
     })
 
-    test('Test-003: Try Job Filter', async ({ page }) => {
+    test('Test-004: Try Job Filter', async ({ page }) => {
         await page.getByText('Job', { exact: true }).click();
         await page.getByRole('menuitem', { name: 'Job Titles '}).click();
 

@@ -2,6 +2,11 @@ import { defineConfig, devices } from '@playwright/test';
 
 export default defineConfig({
   testDir: './tests',
+  testIgnore:[
+    '**/iseng/**',
+    '**/Sauce Demo/**',
+    '**/node_modules/**'
+  ],
   timeout: 60_000,
   expect: { timeout: 10_000 },
   use: {
@@ -37,8 +42,17 @@ export default defineConfig({
         storageState: 'playwright/.auth/user.json',
       },
       dependencies: ['setup'],
-      testIgnore: /.*\.setup\.ts/,
+      testIgnore: [/.*\.setup\.ts/, /.*login\.spec\.ts/],
     },
+    // Login test : fresh browser tanpa storage state
+    {
+      name: 'login-tests',
+      use: {
+        ...devices['Desktop Chrome'],
+      },
+      testMatch: /.*login\.spec\.ts/, //hanya jalankan file yang namanya login.spec.ts
+      dependencies: [], //tidak perlu tunggu setup karena dia mau test login dari nol
+    }
 
     // {
     //   name: 'firefox',
