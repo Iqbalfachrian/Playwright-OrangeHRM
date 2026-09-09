@@ -1,8 +1,14 @@
 import { test, expect } from '@playwright/test'
+import { generateUniqueString } from '../../../utils/testData'
 import path from 'path'
+
+let createdEmployeeName: string;
+let createdEmployeeId: string;
+let createdDriverLicense: string;
 
 
 test.describe('Navigate to PIM Menu', () => {
+    test.describe.configure({ mode: 'serial' })
     test.beforeEach(async ({ page }) => {
         await page.goto('/web/index.php/pim/viewEmployeeList');
         await expect(page).toHaveURL(/viewEmployeeList/);
@@ -18,18 +24,20 @@ test.describe('Navigate to PIM Menu', () => {
         await expect(page).toHaveURL(/addEmployee/)
 
         //Add Employee
-        await page.getByRole('textbox', { name: 'First Name'}).fill('Yier');
-        await page.getByRole('textbox', { name: 'Middle Name'}).fill('and');
-        await page.getByRole('textbox', { name: 'Last Name'}).fill('Bubu');
+
+        createdEmployeeName = generateUniqueString('Yier Bubu')
+        await page.getByRole('textbox', { name: 'First Name'}).fill(createdEmployeeName);
+        await page.getByRole('textbox', { name: 'Last Name'}).fill('Gemesh');
 
         const employeeId = page
         .locator('.oxd-grid-item')
         .filter({ hasText: 'Employee Id'})
         .locator('input');
 
+        createdEmployeeId = generateUniqueString('ID');
         await expect(employeeId).toBeVisible();
         await expect(employeeId).toBeEditable();
-        await employeeId.fill('0001');
+        await employeeId.fill(createdEmployeeId);
 
         await page.getByRole('button', { name: 'Save' }).click();
 
@@ -55,8 +63,10 @@ test.describe('Navigate to PIM Menu', () => {
             has: page.locator('label', { hasText: "Driver's License Number" })
         });
 
+        createdDriverLicense = generateUniqueString('DL');
+
         const fillDriverLicense = driverLicense.locator('.oxd-input--active')
-        await fillDriverLicense.fill('123456789');
+        await fillDriverLicense.fill(createdDriverLicense);
 
         const datePicker = page
         .locator('.oxd-input-group')
