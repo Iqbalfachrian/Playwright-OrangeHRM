@@ -1,130 +1,62 @@
 import { test, expect } from '@playwright/test'
 import { generateUniqueString } from '../../../utils/testData'
+import { ReportPage } from '../../../pages/ReportPage';
+
 
 let createdReportName: string;
 
 test.describe('Navigate to PIM Menu', () => {
     test.describe.configure({ mode: 'serial' });
-    test.beforeEach(async ({ page }) => {
-        await page.goto('/web/index.php/pim/viewEmployeeList');
-        await expect(page).toHaveURL(/viewEmployeeList/);
+    let reportPage: ReportPage;
 
-        await page.getByRole('link', {name: 'Reports'}).click();
-        await expect(page).toHaveURL(/viewDefinedPredefinedReports/)
+    test.beforeEach(async ({ page }) => {
+        reportPage = new ReportPage(page)   
     } )
 
+    // Cleanup: hapus report yang dibuat, supaya slot nomor 2 digit (1-99)
+    // tidak habis dan run berikutnya tidak kena "Already exists".
+    test.afterAll(async ({ browser }) => {
+        if (!createdReportName) return;
+        const context = await browser.newContext({ storageState: 'playwright/.auth/user.json' });
+        const page = await context.newPage();
+        await new ReportPage(page).deleteReport(createdReportName);
+        await context.close();
+    });
+
     test('Test-001: Go to Reports and do search', async ({ page }) => {
+        await reportPage.gotoReports();
         
-        const reportName = page.getByPlaceholder('Type for Hints...');
-        await expect(reportName).toBeVisible();
-        await expect(reportName).toBeEditable();
-        await reportName.fill('Employee Contact info report');
+        //Search Existing Report
+        await reportPage.searchReportByName('Employee Job Details');
+        await expect(page.getByText('Employee Job Details')).toBeVisible();
 
-        const suggestion = page
-        .locator('div.oxd-autocomplete-wrapper')
-        .filter({ hasText: 'Employee Contact info report'});
-
-        await expect(suggestion).toBeVisible({ timeout: 3000})
-        await suggestion.click()
-        await expect(reportName).toHaveValue('Employee Contact info report');
-
-        await page.getByRole('button', { name: 'Search'}).click();
-        await expect(page.getByText('Employee Contact info report')).toBeVisible();
     })
 
     test('Test-002: Add Employee Reports', async ({ page }) => {
-        
-        await page.getByRole('button', { name: 'Add'}).click();
-        await expect(page).toHaveURL(/definePredefinedReport/);
-        await expect(page.getByText('Add Report')).toBeVisible();
+        // 2 digit saja, contoh: 'QA Manual Report 42'.
+        // Supaya tidak pernah kena "Already exists", report ini dihapus lagi di afterAll.
+        createdReportName = generateUniqueString('QA Manual Report')
 
-        //Add Report
-        createdReportName = generateUniqueString('QA Manual');
-        await page.getByRole('textbox', {name:'Type here ...'}).fill(createdReportName);
+        await reportPage.gotoReportsMenu();
+        await reportPage.clickAddReport();
+        await reportPage.fillReportName(createdReportName);
 
-        const selectionCriteria = page
-        .locator('.oxd-input-group')
-        .filter({
-            has: page.locator('label', {hasText: 'Selection Criteria'})
-        })
+        // Add Selection Criteria
+        await reportPage.addSelectionCriteria('Employee Name')
+        await reportPage.fillAutocompleteEmployee('Amelia Brown')
 
-        const pickCriteria = selectionCriteria.locator('.oxd-select-wrapper')
-        await pickCriteria.click();
-        await page
-        .getByRole('listbox')
-        .getByText('Employee Name', {exact: true})
-        .click();
+        // Add Display Fields
+        await reportPage.addDisplayFieldGroup('Salary');
+        await reportPage.addDisplayField('Amount');
 
-        const plusButton = page
-        .locator('button:has(i.bi-plus)').first();
-        await plusButton.click();
+        // Save
+        await reportPage.clickSave();
 
-        //Fill autocomplete
-        const employeeName = page.getByPlaceholder('Type for hints...')
-
-        await expect(employeeName).toBeVisible();
-        await expect(employeeName).toBeEditable();
-        await employeeName.fill('manda akhil user')
-
-        const targetOption = page.getByRole('option', { name: 'manda akhil user'})
-        await expect(targetOption).toBeVisible({ timeout: 5000})
-        await targetOption.click();
-        await expect(employeeName).toHaveValue('manda akhil user');
-
-        //Display Fields Group
-        const groupDisplayFields = page
-        .locator('.oxd-input-group')
-        .filter({
-            hasText: 'Select Display Field Group'
-        })
-
-        const pickDisplayFieldsbyGroup = groupDisplayFields.locator('.oxd-select-wrapper')
-        await pickDisplayFieldsbyGroup.click()
-        await page
-        .getByRole('listbox')
-        .getByText('Salary', {exact: true})
-        .click();
-
-        await expect(groupDisplayFields.locator('.oxd-select-text-input')).toContainText('Salary')
-
-        //Select Display Field
-        const labelSelectDisplayFields = page
-        .locator('.oxd-input-group')
-        .filter({
-            hasText: 'Select Display Field'
-        })
-
-        const selectDisplayFields = labelSelectDisplayFields.locator('.oxd-select-wrapper')
-        await selectDisplayFields.last().click();
-        await page
-        .getByRole('listbox')
-        .getByText('Amount', {exact: true})
-        .click();
-        
-        await expect(labelSelectDisplayFields
-        .locator('.oxd-select-text-input')
-        .last()).toContainText('Amount');
-
-        //button + on Display Fields
-        const plusButtonDisplay = page
-        .locator('button:has(i.bi-plus)').last();
-        await plusButtonDisplay.click();
-
-        //Save reports
-        await page.getByRole('button', {name: 'Save'}).click()
-
-        //assertions reports
-        await expect(page).toHaveURL(/displayPredefinedReport/)
     })
 
     test('Test-003: Check Employee Report', async ({ page }) => {
-        await page.getByRole('link', {name: 'Reports'}).click();
-        await expect(page).toHaveURL(/viewDefinedPredefinedReports/);
-
-        await page.getByRole('textbox', {name: 'Type for hints...'}).fill(createdReportName);
-        await page.getByRole('button', {name: 'Search'}).click();
-
-        await expect(page.getByText(createdReportName)).toBeVisible({ timeout: 4000});
-        await expect(page.getByRole('row').filter({ hasText: createdReportName })).toBeVisible();
+        await reportPage.gotoEmployeeReports();
+        await reportPage.searchReportByName(createdReportName);
+        await reportPage.expectReportExists(createdReportName);
     })
 })

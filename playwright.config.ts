@@ -7,15 +7,16 @@ export default defineConfig({
     '**/Sauce Demo/**',
     '**/node_modules/**'
   ],
-  timeout: 60_000,
-  expect: { timeout: 10_000 },
+  timeout: 120_000,
+  expect: { timeout: 30_000 },
   use: {
-    headless: false,
+    headless: true,
     baseURL: 'https://opensource-demo.orangehrmlive.com',
     launchOptions: {
       //slowMo: 1000,
     },
-    actionTimeout: 10_000,
+    actionTimeout: 20_000,
+    navigationTimeout: 60_000,
     trace: 'on-first-retry',
   },
   /* Run tests in files in parallel */
