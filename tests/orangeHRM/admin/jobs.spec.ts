@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test'
 import path from 'path'
 import { generateUniqueString } from '../../../utils/testData'
-import { AdminPage } from '../../../pages/AdminPages';
+import { AdminPage } from '../../../pages/AdminPage';
 
 let createdJobTitle: string;
 let editedJobTitle: string;

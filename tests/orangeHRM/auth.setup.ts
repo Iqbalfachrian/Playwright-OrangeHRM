@@ -1,6 +1,6 @@
 import { test as setup } from '@playwright/test';
 import dotenv from 'dotenv';
-import { LoginPage } from '../../pages/LoginPages';
+import { LoginPage } from '../../pages/LoginPage';
 
 dotenv.config();
 //Tentukan path file storage state
